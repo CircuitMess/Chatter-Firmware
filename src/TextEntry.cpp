@@ -4,7 +4,7 @@
 
 TextEntry* TextEntry::instance = nullptr;
 
-TextEntry::TextEntry(uint8_t width, String text) : width(width){
+TextEntry::TextEntry(uint8_t width, String text = " ") : width(width){
 
 	instance = this;
 
@@ -16,7 +16,7 @@ void TextEntry::activate(){
 	if(cursorBlink){
 		baseSprite->setTextColor(TFT_BLACK);
 		baseSprite->setTextFont(1);
-		baseSprite->setCursor(width + 1,1);
+		baseSprite->setCursor(width ,1);
 		baseSprite->print('|');
 	}
 }

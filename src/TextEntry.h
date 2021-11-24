@@ -9,7 +9,7 @@
 
 class TextEntry : public LoopListener, private InputListener{
 public:
-	TextEntry(uint8_t width, String text = " ");
+	TextEntry(uint8_t width, String text);
 
 	void activate();
 
