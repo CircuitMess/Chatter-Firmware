@@ -1,12 +1,13 @@
-#ifndef CHATTER_FIRMWARE_TEXTENTRYUI_H
-#define CHATTER_FIRMWARE_TEXTENTRYUI_H
+#ifndef CHATTER_FIRMWARE_TEXTENTRY_H
+#define CHATTER_FIRMWARE_TEXTENTRY_H
 
 #include <Arduino.h>
 #include <Loop/LoopListener.h>
 #include <Loop/LoopManager.h>
 #include <Display/Sprite.h>
+#include <Input/InputListener.h>
 
-class TextEntry : public LoopListener {
+class TextEntry : public LoopListener, private InputListener{
 public:
 	TextEntry(uint8_t width, String text = " ");
 
@@ -28,4 +29,4 @@ private:
 	Sprite* baseSprite;
 };
 
-#endif //CHATTER_FIRMWARE_TEXTENTRYUI_H
+#endif //CHATTER_FIRMWARE_TEXTENTRY_H

@@ -1,4 +1,4 @@
-#include "TextEntryUI.h"
+#include "TextEntry.h"
 #include <Input/InputShift.h>
 #include <Loop/LoopManager.h>
 
@@ -11,7 +11,7 @@ TextEntry::TextEntry(uint8_t width, String text) : width(width){
 }
 
 void TextEntry::activate(){
-	InputShift::getInstance()->addListener(this);
+	Input::getInstance()->addListener(this);
 	LoopManager::addListener(this);
 	if(cursorBlink){
 		baseSprite->setTextColor(TFT_BLACK);
