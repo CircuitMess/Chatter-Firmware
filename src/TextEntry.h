@@ -22,6 +22,8 @@ public:
 private:
 	static TextEntry* instance;
 
+	void buttonPressed(uint id) override;
+
 	uint8_t width = 0;
 	String text;
 	uint32_t cursorTime = 0;

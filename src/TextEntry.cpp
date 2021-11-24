@@ -37,3 +37,10 @@ void TextEntry::loop(uint micros){
 		cursorBlink = !cursorBlink;
 	}
 }
+
+void TextEntry::buttonPressed(uint id){
+	if(id == btnBack){
+		Input::getInstance()->removeListener(this);
+		LoopManager::removeListener(this);
+	}
+}
