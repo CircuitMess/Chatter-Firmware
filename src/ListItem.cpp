@@ -3,7 +3,7 @@
 
 const char* const ListItem::icons[] = {};
 
-ListItem::ListItem(ElementContainer* parent, uint8_t icon, char text) : CustomElement(parent, 20, 20), icon(icon), text(text){
+ListItem::ListItem(ElementContainer* parent, uint8_t icon, char text) : CustomElement(parent, 160, 20), icon(icon), text(text){
 	iconBuffer = static_cast<Color*>(malloc(20*20*2));
 	if(iconBuffer == nullptr){
 		Serial.println("ListItem picture unpack error");
@@ -25,6 +25,6 @@ void ListItem::draw(){
 	baseSprite->setTextColor(TFT_BLACK);
 	baseSprite->setTextFont(1);
 	baseSprite->setTextSize(1);
-	baseSprite->setCursor(20, 0);
+	baseSprite->setCursor(20 + (width/ 2 - baseSprite->textWidth(text))/ 2, 0);
 	baseSprite->print(text);
 }
