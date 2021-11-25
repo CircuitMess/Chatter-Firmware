@@ -5,7 +5,7 @@
 
 TextEntry* TextEntry::instance = nullptr;
 
-TextEntry::TextEntry(ElementContainer* parent, uint height, uint8_t width, String text = " ") : CustomElement(parent, width, height), width(width){
+TextEntry::TextEntry(ElementContainer* parent, uint height, uint8_t width, String text = " ") : CustomElement(parent, width, height), width(width),height(height){
 
 	instance = this;
 
@@ -17,7 +17,7 @@ void TextEntry::activate(){
 	if(cursorBlink){
 		baseSprite->setTextColor(TFT_BLACK);
 		baseSprite->setTextFont(1);
-		baseSprite->setCursor(width ,1);
+		baseSprite->setCursor(baseSprite->textWidth(text)+1 ,height);
 		baseSprite->print('|');
 	}
 }
@@ -46,7 +46,7 @@ void TextEntry::buttonPressed(uint id){
 	}else if(id == BTN_1){
 		baseSprite->setTextColor(TFT_BLACK);
 		baseSprite->setTextFont(1);
-		baseSprite->setCursor(width ,1);
+		baseSprite->setCursor(baseSprite->textWidth(text) ,height);
 		baseSprite->print('1');
 
 	}
