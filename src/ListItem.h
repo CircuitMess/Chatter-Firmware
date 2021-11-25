@@ -16,7 +16,7 @@ private:
 	uint8_t icon;
 	char text;
 	uint8_t isSelected = false;
-	String icons[5]={};
+	static const char* const icons[5];
 	Color* iconBuffer = nullptr;
 
 	Sprite* baseSprite;

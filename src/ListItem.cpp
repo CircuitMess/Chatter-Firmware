@@ -1,6 +1,8 @@
 #include "ListItem.h"
 #include <SPIFFS.h>
 
+const char* const ListItem::icons[] = {};
+
 ListItem::ListItem(ElementContainer* parent, uint8_t icon, char text) : CustomElement(parent, 20, 20), icon(icon), text(text){
 	iconBuffer = static_cast<Color*>(malloc(20*20*2));
 	if(iconBuffer == nullptr){
