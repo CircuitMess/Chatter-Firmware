@@ -1,10 +1,11 @@
 #include "TextEntry.h"
 #include <Input/InputShift.h>
 #include <Loop/LoopManager.h>
+#include <Chatter.h>
 
 TextEntry* TextEntry::instance = nullptr;
 
-TextEntry::TextEntry(uint8_t width, String text = " ") : width(width){
+TextEntry::TextEntry(ElementContainer* parent, uint height, uint8_t width, String text = " ") : CustomElement(parent, width, height), width(width){
 
 	instance = this;
 
@@ -39,8 +40,14 @@ void TextEntry::loop(uint micros){
 }
 
 void TextEntry::buttonPressed(uint id){
-	if(id == btnBack){
+	if(id == BTN_BACK){
 		Input::getInstance()->removeListener(this);
 		LoopManager::removeListener(this);
+	}else if(id == BTN_1){
+		baseSprite->setTextColor(TFT_BLACK);
+		baseSprite->setTextFont(1);
+		baseSprite->setCursor(width ,1);
+		baseSprite->print('1');
+
 	}
 }

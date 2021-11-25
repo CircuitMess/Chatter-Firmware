@@ -6,10 +6,11 @@
 #include <Loop/LoopManager.h>
 #include <Display/Sprite.h>
 #include <Input/InputListener.h>
+#include <UI/CustomElement.h>
 
-class TextEntry : public LoopListener, private InputListener{
+class TextEntry : public LoopListener, private InputListener, public CustomElement{
 public:
-	TextEntry(uint8_t width, String text);
+	TextEntry(ElementContainer* parent, uint height, uint8_t width, String text);
 
 	void activate();
 
