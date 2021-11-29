@@ -6,7 +6,7 @@
 
 class ListItem : CustomElement {
 public:
-	ListItem(ElementContainer* parent, uint8_t icon, char text);
+	ListItem(ElementContainer* parent, uint8_t icon, String text);
 
 	void setSelected(uint8_t isSelected);
 
@@ -14,7 +14,7 @@ public:
 
 private:
 	uint8_t icon;
-	char text;
+	String text;
 	uint8_t isSelected = false;
 	static const char* const icons[5];
 	Color* iconBuffer = nullptr;
