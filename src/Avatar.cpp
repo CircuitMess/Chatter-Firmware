@@ -19,5 +19,5 @@ Avatar::~Avatar(){
 
 void Avatar::draw(){
 	baseSprite->clear(TFT_BLACK);
-	baseSprite->drawIcon(avatarBuffer,0,0,20,20,1,TFT_BLACK);
+	baseSprite->drawIcon(avatarBuffer,getTotalX(),getTotalY(),20,20,1,TFT_BLACK);
 }

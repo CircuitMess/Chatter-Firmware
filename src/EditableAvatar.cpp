@@ -7,7 +7,7 @@ EditableAvatar::EditableAvatar(ElementContainer* parent, uint8_t avatarIndex) : 
 void EditableAvatar::draw(){
 	Avatar::draw();
 	if(isSelected){
-		baseSprite->drawRect(Avatar::getX(), Avatar::getY(), 20, 20, TFT_RED);
+		baseSprite->drawRect(getTotalX(), getTotalY(), 20, 20, TFT_RED);
 	}
 	if(active){
 		if(blinkState){
