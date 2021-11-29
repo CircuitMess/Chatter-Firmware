@@ -6,7 +6,7 @@
 
 class ListItem : CustomElement {
 public:
-	ListItem(ElementContainer* parent, uint8_t icon, String text);
+	ListItem(ElementContainer* parent, String text, uint8_t icon);
 
 	void setSelected(uint8_t isSelected);
 
