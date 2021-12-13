@@ -55,10 +55,11 @@ public:
 
 
 		lv_obj_t* img = lv_img_create(obj);
-		lv_img_set_src(img, "S:background.raw");
+		lv_img_set_src(img, "S:/test.bin");
 		lv_obj_set_style_border_width(img, 2, LV_STATE_DEFAULT);
 		lv_obj_align(img, LV_ALIGN_CENTER, 0, 0);
-		lv_obj_set_size(img, 50, 40);
+		lv_obj_set_size(img, 160, 128);
+		Serial.println("----------------");
 
 /*		for(int i = 0; i < 5; i++){
 			User* user = new User(this, esp_random() % 360, "Foo " + String(i + 1));
@@ -88,7 +89,7 @@ void setup(){
 
 	lv_init();
 	lv_disp_draw_buf_init(&drawBuffer, buf, NULL, TFT_WIDTH * TFT_HEIGHT);
-	lv_log_register_print_cb(my_print); /* register print function for debugging */
+//	lv_log_register_print_cb(my_print); /* register print function for debugging */
 
 	static lv_disp_drv_t displayDriver;
 	lv_disp_drv_init(&displayDriver);
@@ -111,5 +112,4 @@ void loop(){
 	lv_timer_handler();
 	LoopManager::loop();
 }
-
 
