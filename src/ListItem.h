@@ -17,6 +17,7 @@ private:
 protected:
 	lv_style_t styleFocus;
 	lv_style_t styleDef;
+	lv_obj_t* name;
 };
 
 
