@@ -12,7 +12,7 @@ ListItem::ListItem(lv_obj_t* parent, const std::string& text, uint16_t hue, uint
 	lv_style_selector_t selFocus = LV_PART_MAIN | LV_STATE_FOCUSED;
 
 	// width / height
-	lv_obj_set_height(obj, LV_SIZE_CONTENT);
+	lv_obj_set_height(obj, 23);
 	lv_obj_set_width(obj, lv_pct(100));
 
 	// Default style
@@ -38,6 +38,8 @@ ListItem::ListItem(lv_obj_t* parent, const std::string& text, uint16_t hue, uint
 		lv_obj_t* plusImg = lv_img_create(obj);
 		lv_img_set_src(plusImg, LV_SYMBOL_PLUS);
 		lv_obj_set_style_text_color(plusImg, lv_color_white(), 0);
+		lv_obj_set_style_pad_left(obj,5,sel);
+		lv_obj_set_style_pad_left(obj,5,selFocus);
 	}
 	// Name
 	name = lv_label_create(obj);
@@ -46,4 +48,7 @@ ListItem::ListItem(lv_obj_t* parent, const std::string& text, uint16_t hue, uint
 	lv_label_set_text(name, text.c_str());
 	lv_obj_set_flex_grow(name, 1);
 	lv_obj_set_style_pad_top(name, 1, 0);
+	if(icon == 0){
+		lv_obj_set_style_pad_left(name, 5, 0);
+	}
 }
