@@ -17,7 +17,7 @@ InboxScreen::InboxScreen() : LVScreen(), apop(this){
 	lv_obj_set_style_bg_img_opa(obj, LV_OPA_100, 0);
 	lv_obj_set_style_bg_img_src(obj, "S:/bg.bin", 0);
 
-	auto listItem = new ListItem(obj,"New conversation",0,0,1);
+	auto listItem = new ListItem(obj,"New conversation",1);
 	lv_group_add_obj(inputGroup, listItem->getLvObj());
 
 	std::vector<UID_t> convos = Storage.Convos.all();
