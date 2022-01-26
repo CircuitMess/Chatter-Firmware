@@ -1,7 +1,7 @@
 #include "ListItem.h"
 #include "font.h"
 
-ListItem::ListItem(lv_obj_t* parent, const std::string& text, uint16_t hue, uint8_t icon) : LVObject(parent), icon(icon), text(text){
+ListItem::ListItem(lv_obj_t* parent, const std::string& text, uint16_t hue, uint8_t opa, uint8_t icon) : LVObject(parent), icon(icon), text(text), opa(opa){
 	lv_obj_set_layout(obj, LV_LAYOUT_FLEX);
 	lv_obj_set_flex_flow(obj, LV_FLEX_FLOW_ROW);
 	lv_obj_set_flex_align(obj, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
@@ -19,6 +19,7 @@ ListItem::ListItem(lv_obj_t* parent, const std::string& text, uint16_t hue, uint
 	lv_style_init(&styleDef);
 	lv_style_set_bg_opa(&styleDef, LV_OPA_100);
 	lv_style_set_bg_color(&styleDef, lv_color_hsv_to_rgb(hue, 60, 85));
+	lv_style_set_bg_opa(&styleDef,opa);
 	lv_style_set_border_color(&styleDef, lv_color_white());
 	lv_style_set_border_opa(&styleDef, LV_OPA_100);
 	lv_style_set_border_width(&styleDef, 1);
@@ -30,6 +31,7 @@ ListItem::ListItem(lv_obj_t* parent, const std::string& text, uint16_t hue, uint
 	lv_style_set_pad_all(&styleFocus, 1);
 	lv_style_set_border_width(&styleFocus, 2);
 	lv_style_set_bg_color(&styleFocus, lv_color_hsv_to_rgb(hue, 85, 100));
+	lv_style_set_bg_opa(&styleFocus,opa);
 	lv_obj_add_style(obj, &styleFocus, selFocus);
 
 	if(icon != 0){
