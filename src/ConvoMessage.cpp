@@ -1,6 +1,7 @@
 #include "ConvoMessage.h"
 #include <Arduino.h>
 #include "font.h"
+#include "Pics.h"
 
 ConvoMessage::ConvoMessage(lv_obj_t* parent, const Message& msg, uint8_t bgColor) : LVObject(parent), msg(msg){
 	bool outgoing = msg.outgoing;
@@ -14,7 +15,16 @@ ConvoMessage::ConvoMessage(lv_obj_t* parent, const Message& msg, uint8_t bgColor
 	lv_obj_set_style_pad_gap(obj, 1, 0);
 	lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
 
-	lv_obj_t* label = lv_label_create(obj);
+	if(msg.getType() == Message::TEXT){
+		label = lv_label_create(obj);
+		lv_label_set_text(label, msg.getText().c_str());
+		lv_label_set_long_mode(label, LV_LABEL_LONG_WRAP);
+		lv_obj_set_style_text_font(label, &pixelbasic_7, 0);
+	}else if(msg.getType() == Message::PIC){
+		Pic pic = Pics[msg.getPic()];
+		label = pic.create(obj);
+	}
+
 	if(outgoing){
 		deliveredIndicator = lv_obj_create(obj);
 		lv_obj_set_size(deliveredIndicator, 7, 7);
@@ -26,13 +36,9 @@ ConvoMessage::ConvoMessage(lv_obj_t* parent, const Message& msg, uint8_t bgColor
 		lv_obj_set_style_border_width(deliveredIndicator, 2, 0);
 	}
 
-	lv_label_set_text(label, msg.getText().c_str());
-	lv_obj_set_style_text_font(label, &pixelbasic_7, 0);
-
 	lv_obj_set_height(label, LV_SIZE_CONTENT);
 	lv_obj_update_layout(obj);
 
-	lv_label_set_long_mode(label, LV_LABEL_LONG_WRAP);
 	lv_obj_set_scrollbar_mode(label, LV_SCROLLBAR_MODE_OFF);
 
 	lv_style_init(&defaultStyle);
@@ -51,11 +57,13 @@ ConvoMessage::ConvoMessage(lv_obj_t* parent, const Message& msg, uint8_t bgColor
 
 	//focus forwarding to label child
 	lv_obj_add_event_cb(obj, [](lv_event_t* event){
-		lv_obj_add_state(lv_obj_get_child(lv_event_get_target(event), 0), LV_STATE_FOCUSED);
+		auto* msg = static_cast<ConvoMessage*>(event->user_data);
+		lv_obj_add_state(msg->label, LV_STATE_FOCUSED);
 	}, LV_EVENT_FOCUSED, this);
 
 	lv_obj_add_event_cb(obj, [](lv_event_t* event){
-		lv_obj_clear_state(lv_obj_get_child(lv_event_get_target(event), 0), LV_STATE_FOCUSED);
+		auto* msg = static_cast<ConvoMessage*>(event->user_data);
+		lv_obj_clear_state(msg->label, LV_STATE_FOCUSED);
 	}, LV_EVENT_DEFOCUSED, this);
 }
 
@@ -64,8 +72,14 @@ void ConvoMessage::setDelivered(bool delivered){
 
 	msg.received = delivered;
 	lv_obj_set_style_bg_opa(deliveredIndicator, delivered ? LV_OPA_100 : LV_OPA_0, 0);
+	lv_obj_invalidate(obj);
 }
 
 const Message& ConvoMessage::getMsg() const{
 	return msg;
+}
+
+void ConvoMessage::clearFocus(){
+	lv_obj_clear_state(obj, LV_STATE_FOCUSED);
+	lv_obj_clear_state(label, LV_STATE_FOCUSED);
 }

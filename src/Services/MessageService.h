@@ -8,22 +8,53 @@
 #include "LoRaPacket.h"
 #include <string>
 #include <Loop/LoopListener.h>
+#include <unordered_map>
+#include "../WithListeners.h"
 
-class MessageService : public LoopListener {
+class MsgReceivedListener;
+class MsgChangedListener;
+
+class MessageService : public LoopListener, public WithListeners<MsgReceivedListener>, public WithListeners<MsgChangedListener> {
 public:
-	bool sendText(Convo& convo, const std::string& text);
-	bool sendPic(Convo& convo, uint16_t index);
+	Message sendText(UID_t convo, const std::string& text);
+	Message sendPic(UID_t convo, uint16_t index);
+
+	Message resend(UID_t convo, UID_t message);
+
+	bool deleteMessage(UID_t convo, UID_t msg);
+
+	Message getLastMessage(UID_t convo);
 
 	void begin();
 	void loop(uint micros) override;
 
+	void addReceivedListener(MsgReceivedListener* listener);
+	void addChangedListener(MsgChangedListener* listener);
+
+	void removeReceivedListener(MsgReceivedListener* listener);
+	void removeChangedListener(MsgChangedListener* listener);
+
 private:
-	bool sendMessage(Convo& convo, Message& message);
+	Message sendMessage(UID_t convo, Message& message);
 	bool sendPacket(UID_t receiver, const Message& message);
 
 	void receiveMessage(ReceivedPacket<MessagePacket>& packet);
 	void receiveAck(ReceivedPacket<MessagePacket>& packet);
 
+	std::unordered_map<UID_t, Message> lastMessages;
+
+};
+
+class MsgReceivedListener {
+friend MessageService;
+private:
+	virtual void msgReceived(const Message& message) = 0;
+};
+
+class MsgChangedListener {
+friend MessageService;
+private:
+	virtual void msgChanged(const Message& message) = 0;
 };
 
 extern MessageService Messages;

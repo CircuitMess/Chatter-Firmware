@@ -7,22 +7,35 @@ MessageService Messages;
 
 void MessageService::begin(){
 	LoopManager::addListener(this);
+
+	for(UID_t uid : Storage.Convos.all()){
+		Convo convo = Storage.Convos.get(uid);
+		if(convo.uid == 0 || convo.messages.empty()) continue;
+
+		Message msg = Storage.Messages.get(convo.messages.back());
+		if(msg.uid == 0) continue;
+
+		lastMessages.insert(std::make_pair(uid, msg));
+	}
 }
 
-bool MessageService::sendText(Convo& convo, const std::string& text){
+Message MessageService::sendText(UID_t convo, const std::string& text){
 	Message message;
 	message.setText(text);
 	return sendMessage(convo, message);
 }
 
-bool MessageService::sendPic(Convo& convo, uint16_t index){
+Message MessageService::sendPic(UID_t convo, uint16_t index){
 	Message message;
 	message.setPic(index);
 	return sendMessage(convo, message);
 }
 
-bool MessageService::sendMessage(Convo& convo, Message& message){
-	if(!Storage.Friends.exists(convo.uid)) return false;
+Message MessageService::sendMessage(UID_t uid, Message& message){
+	if(!Storage.Friends.exists(uid)) return { };
+
+	Convo convo = Storage.Convos.get(uid);
+	if(convo.uid == 0) return { };
 
 	do {
 		message.uid = LoRa.randUID();
@@ -30,14 +43,27 @@ bool MessageService::sendMessage(Convo& convo, Message& message){
 
 	message.outgoing = true;
 
-	if(!sendPacket(convo.uid, message)) return false;
+	if(!sendPacket(uid, message)) return { };
 
-	if(!Storage.Messages.add(message)) return false;
+	if(!Storage.Messages.add(message)) return { };
 
 	convo.messages.push_back(message.uid);
-	if(!Storage.Convos.update(convo)) return false;
+	if(!Storage.Convos.update(convo)) return { };
 
-	return true;
+	lastMessages[convo.uid] = message;
+
+	return message;
+}
+
+Message MessageService::resend(UID_t convo, UID_t message){
+	if(!Storage.Convos.exists(convo)) return { };
+
+	Message msg = Storage.Messages.get(message);
+	if(msg.uid == 0) return { };
+	if(msg.received || !msg.outgoing) return { };
+
+	sendPacket(convo, msg);
+	return msg;
 }
 
 bool MessageService::sendPacket(UID_t receiver, const Message& message){
@@ -56,6 +82,27 @@ bool MessageService::sendPacket(UID_t receiver, const Message& message){
 
 	delete packet;
 	return true;
+}
+
+bool MessageService::deleteMessage(UID_t convoUID, UID_t msgUID){
+	Convo convo = Storage.Convos.get(convoUID);
+	if(convo.uid == 0) return false;
+
+	auto pos = std::find(convo.messages.begin(), convo.messages.end(), msgUID);
+	if(pos == convo.messages.end()) return false;
+
+	convo.messages.erase(pos);
+	if(!Storage.Convos.update(convo)) return false;
+
+	if(!Storage.Messages.remove(msgUID)) return false;
+
+	return true;
+}
+
+Message MessageService::getLastMessage(UID_t convo){
+	auto pair = lastMessages.find(convo);
+	if(pair == lastMessages.end()) return { };
+	return pair->second;
 }
 
 void MessageService::loop(uint micros){
@@ -88,6 +135,26 @@ void MessageService::receiveMessage(ReceivedPacket<MessagePacket>& packet){
 		return;
 	}
 
+	Message existing = Storage.Messages.get(message.uid);
+	if(existing.uid != 0){
+		if(message.convo != existing.convo || message.getType() != existing.getType()){
+			printf("Got message with already existing uid!\n");
+			return;
+		}
+
+		// Message is already received, resend ACK packet
+		MessagePacket ack;
+		ack.type = MessagePacket::ACK;
+		ack.uid = message.uid;
+		LoRa.send(packet.sender, LoRaPacket::Type::MSG, &ack);
+		return;
+	}
+
+	if(!Storage.Messages.add(message)){
+		printf("Error adding message\n");
+		return;
+	}
+
 	Convo convo = Storage.Convos.get(packet.sender);
 	if(convo.uid == 0){
 		convo.uid = packet.sender;
@@ -95,15 +162,17 @@ void MessageService::receiveMessage(ReceivedPacket<MessagePacket>& packet){
 	}
 
 	convo.messages.push_back(message.uid);
-
-	if(!Storage.Messages.add(message)){
-		printf("Error adding message\n");
-	}
 	if(!Storage.Convos.update(convo)){
 		printf("Error updating convo\n");
+		Storage.Messages.remove(message.uid);
+		return;
 	}
 
-	// TODO: call new message listeners
+	lastMessages[convo.uid] = message;
+
+	for(auto listener : WithListeners<MsgReceivedListener>::getListeners()){
+		listener->msgReceived(message);
+	}
 
 	MessagePacket ack;
 	ack.type = MessagePacket::ACK;
@@ -124,5 +193,23 @@ void MessageService::receiveAck(ReceivedPacket<MessagePacket>& packet){
 		printf("Message ACK update failed\n");
 	}
 
-	// TODO: call listeners
+	for(auto listener : WithListeners<MsgChangedListener>::getListeners()){
+		listener->msgChanged(msg);
+	}
+}
+
+void MessageService::addReceivedListener(MsgReceivedListener* listener){
+	WithListeners<MsgReceivedListener>::addListener(listener);
+}
+
+void MessageService::addChangedListener(MsgChangedListener* listener){
+	WithListeners<MsgChangedListener>::addListener(listener);
+}
+
+void MessageService::removeReceivedListener(MsgReceivedListener* listener){
+	WithListeners<MsgReceivedListener>::removeListener(listener);
+}
+
+void MessageService::removeChangedListener(MsgChangedListener* listener){
+	WithListeners<MsgChangedListener>::removeListener(listener);
 }

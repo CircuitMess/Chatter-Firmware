@@ -19,6 +19,7 @@ MessagePacket* MessagePacket::unpack(void* _buffer){
 
 	if(type == ACK){
 		packet = new MessagePacket;
+		packet->type = ACK;
 	}else if(type == TEXT){
 		packet = TextMessage::unpack(buffer + sizeof(type) + sizeof(uid));
 	}else if(type == PIC){
@@ -70,7 +71,7 @@ PicMessage::PicMessage(){
 	type = PIC;
 }
 
-PicMessage::PicMessage(uint16_t index) : PicMessage(){
+PicMessage::PicMessage(uint8_t index) : PicMessage(){
 	this->index = index;
 }
 
@@ -78,15 +79,15 @@ size_t PicMessage::pack(void** destination) const {
 	uint8_t* buffer;
 	size_t size = MessagePacket::pack(reinterpret_cast<void**>(&buffer));
 
-	buffer = static_cast<uint8_t*>(realloc(buffer, size + 2));
-	memcpy(buffer + size, &index, 2);
+	buffer = static_cast<uint8_t*>(realloc(buffer, size + 1));
+	memcpy(buffer + size, &index, 1);
 
 	*destination = buffer;
-	return size + 2;
+	return size + 1;
 }
 
 PicMessage* PicMessage::unpack(void* _buffer){
 	PicMessage* message = new PicMessage;
-	message->index = *static_cast<uint16_t*>(_buffer);
+	message->index = *static_cast<uint8_t*>(_buffer);
 	return message;
 }
