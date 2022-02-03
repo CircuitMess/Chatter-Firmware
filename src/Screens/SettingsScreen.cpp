@@ -78,7 +78,7 @@ SettingsScreen::SettingsScreen() : LVScreen(){
 	lv_obj_set_layout(sleepTime, LV_LAYOUT_FLEX);
 	lv_obj_set_flex_flow(sleepTime, LV_FLEX_FLOW_ROW);
 	lv_obj_set_flex_align(sleepTime, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-	lv_obj_set_style_pad_gap(sleepTime, 30, 0);
+	lv_obj_set_style_pad_gap(sleepTime, 27, 0);
 	lv_obj_set_style_pad_all(sleepTime, 3, 0);
 	lv_obj_set_style_bg_opa(sleepTime, 0, 0);
 	lv_obj_add_style(sleepTime, &style_pressed, selPress);
@@ -107,9 +107,7 @@ SettingsScreen::SettingsScreen() : LVScreen(){
 
 	lv_group_add_obj(inputGroup, sleepSlider);
 
-
 	lv_slider_set_range(sleepSlider, 0, 4);
-	//lv_slider_set_value(sleepSlider, 2, LV_ANIM_ON);
 	lv_obj_remove_style_all(sleepSlider);        /*Remove the styles coming from the theme*/
 	lv_obj_set_size(sleepSlider, 50, 12);
 
@@ -120,8 +118,7 @@ SettingsScreen::SettingsScreen() : LVScreen(){
 	lv_obj_set_style_text_font(sleepTimeLabel, &pixelbasic_7, 0);
 	lv_obj_set_style_text_color(sleepTimeLabel, lv_color_black(), 0);
 	lv_obj_set_style_pad_top(sleepTimeLabel,1,0);
-	//lv_obj_set_style_pad_right(sleepTimeLabel,60,0);
-	sprintf(sleepBuf,"%d", lv_slider_get_value(sleepSlider));
+	sprintf(sleepBuf,"%d", (Settings.get().sleepTime)*5);
 	lv_label_set_text(sleepTimeLabel, sleepBuf);
 
 	lv_obj_add_event_cb(sleepSlider, [](lv_event_t* event){
@@ -146,7 +143,6 @@ SettingsScreen::SettingsScreen() : LVScreen(){
 	lv_obj_add_style(sleepSlider, &style_knob, LV_PART_KNOB);
 	lv_style_set_text_font(&style_knob, &pixelbasic_7);
 	lv_style_set_text_color(&style_knob, lv_color_white());
-//	lv_style_set_size(&style_knob, 2);
 	lv_style_set_height(&style_knob, 10);
 	lv_style_set_width(&style_knob, 10);
 	lv_obj_add_style(sleepSlider, &style_knob, LV_PART_KNOB | LV_STATE_EDITED);
@@ -158,7 +154,7 @@ SettingsScreen::SettingsScreen() : LVScreen(){
 	lv_obj_set_layout(screenBrightness, LV_LAYOUT_FLEX);
 	lv_obj_set_flex_flow(screenBrightness, LV_FLEX_FLOW_ROW);
 	lv_obj_set_flex_align(screenBrightness, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-	lv_obj_set_style_pad_gap(screenBrightness, 45, 0);
+	lv_obj_set_style_pad_gap(screenBrightness, 41, 0);
 	lv_obj_set_style_pad_all(screenBrightness, 3, 0);
 	lv_obj_set_style_bg_opa(screenBrightness, 0, 0);
 	lv_obj_add_style(screenBrightness, &style_pressed, selPress);
@@ -172,7 +168,6 @@ SettingsScreen::SettingsScreen() : LVScreen(){
 
 	brightnessSlider = lv_slider_create(screenBrightness);
 	lv_slider_set_range(brightnessSlider, 0, 255);
-//	lv_slider_set_value(brightnessSlider, 50, LV_ANIM_OFF);
 	lv_obj_remove_style_all(brightnessSlider);        /*Remove the styles coming from the theme*/
 	lv_obj_set_size(brightnessSlider, 50, 12);
 
