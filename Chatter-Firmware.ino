@@ -13,6 +13,7 @@
 #include "src/Services/MessageService.h"
 #include "src/IntroScreen.h"
 #include "src/Pics.h"
+#include "src/Screens/SettingsScreen.h"
 
 lv_disp_draw_buf_t drawBuffer;
 Display* display;
@@ -119,7 +120,7 @@ void setup(){
 
 	Chatter.getInput()->addListener(new InputChatter());
 
-	auto screen = new IntroScreen();
+	auto screen = new SettingsScreen();
 	screen->start();
 	lv_timer_handler();
 
@@ -132,7 +133,7 @@ void setup(){
 	Storage.begin();
 	Messages.begin();
 
-	screen->startAnim();
+	//screen->startAnim();
 }
 
 void loop(){
