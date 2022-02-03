@@ -101,7 +101,12 @@ SettingsScreen::SettingsScreen() : LVScreen(){
 	}, LV_EVENT_DEFOCUSED, nullptr);
 
 	lv_obj_add_event_cb(sleepSlider, [](lv_event_t* event){
-		sprintf(((SettingsScreen*)lv_event_get_user_data(event))->sleepBuf,"%d", lv_slider_get_value(event->target)*5);
+		if(lv_slider_get_value(event->target) == 0){
+			sprintf(((SettingsScreen*)lv_event_get_user_data(event))->sleepBuf,"OFF");
+
+		}else{
+			sprintf(((SettingsScreen*)lv_event_get_user_data(event))->sleepBuf,"%d min", lv_slider_get_value(event->target)*5);
+		}
 		lv_label_set_text(((SettingsScreen*)lv_event_get_user_data(event))->sleepTimeLabel, ((SettingsScreen*)lv_event_get_user_data(event))->sleepBuf);
 	}, LV_EVENT_VALUE_CHANGED, this);
 
@@ -118,7 +123,11 @@ SettingsScreen::SettingsScreen() : LVScreen(){
 	lv_obj_set_style_text_font(sleepTimeLabel, &pixelbasic_7, 0);
 	lv_obj_set_style_text_color(sleepTimeLabel, lv_color_black(), 0);
 	lv_obj_set_style_pad_top(sleepTimeLabel,1,0);
-	sprintf(sleepBuf,"%d", (Settings.get().sleepTime)*5);
+	if(Settings.get().sleepTime == 0){
+		sprintf(sleepBuf,"OFF");
+	}else{
+		sprintf(sleepBuf, "%d min", (Settings.get().sleepTime) * 5);
+	}
 	lv_label_set_text(sleepTimeLabel, sleepBuf);
 
 	lv_obj_add_event_cb(sleepSlider, [](lv_event_t* event){
