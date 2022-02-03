@@ -62,9 +62,13 @@ SettingsScreen::SettingsScreen() : LVScreen(){
 	lv_group_add_obj(inputGroup, soundSwitch);
 
 	lv_obj_remove_style(soundSwitch, nullptr,LV_STATE_FOCUS_KEY);
+	lv_obj_set_style_border_width(soundSwitch, 1, LV_PART_INDICATOR | LV_STATE_CHECKED);
+	lv_obj_set_style_border_color(soundSwitch, lv_color_white(), LV_PART_INDICATOR | LV_STATE_CHECKED);
+	lv_obj_set_style_bg_color(soundSwitch,lv_color_hex(0x813df5),LV_PART_INDICATOR | LV_STATE_CHECKED);
+	lv_obj_set_style_bg_opa(soundSwitch, LV_OPA_100, LV_PART_INDICATOR | LV_STATE_CHECKED);
 	lv_obj_set_style_border_width(soundSwitch, 1, 0);
 	lv_obj_set_style_border_color(soundSwitch, lv_color_white(), 0);
-	lv_obj_set_style_bg_opa(soundSwitch, 0, 0);
+	lv_obj_set_style_bg_opa(soundSwitch, LV_OPA_0, 0);
 	lv_obj_set_size(soundSwitch, 25, 15);
 
 	//sleepTime
