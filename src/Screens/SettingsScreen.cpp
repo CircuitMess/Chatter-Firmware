@@ -1,6 +1,8 @@
 #include "SettingsScreen.h"
 #include <Settings.h>
 #include <string>
+#include "../font.h"
+
 SettingsScreen::SettingsScreen() : LVScreen(){
 
 	lv_style_selector_t sel = LV_PART_MAIN | LV_STATE_DEFAULT;
