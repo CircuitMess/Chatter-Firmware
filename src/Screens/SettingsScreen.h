@@ -9,7 +9,7 @@ public:
 
 	virtual ~SettingsScreen();
 
-	void onStart() override;
+	void onStarting() override;
 
 	void onStop() override;
 
