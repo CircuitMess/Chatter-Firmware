@@ -61,6 +61,11 @@ SettingsScreen::SettingsScreen() : LVScreen(){
 		lv_obj_clear_state(lv_obj_get_parent(lv_event_get_target(event)), LV_STATE_FOCUSED);
 	}, LV_EVENT_DEFOCUSED, nullptr);
 
+	lv_obj_add_event_cb(soundSwitch, [](lv_event_t* event){
+		SettingsScreen* soundSwitch = static_cast<SettingsScreen*>(event->user_data);
+		soundSwitch->pop();
+	}, LV_EVENT_CANCEL, this);
+
 	lv_group_add_obj(inputGroup, soundSwitch);
 
 	lv_obj_remove_style(soundSwitch, nullptr,LV_STATE_FOCUS_KEY);
@@ -101,6 +106,13 @@ SettingsScreen::SettingsScreen() : LVScreen(){
 	lv_obj_add_event_cb(sleepSlider, [](lv_event_t* event){
 		lv_obj_clear_state(lv_obj_get_parent(lv_event_get_target(event)), LV_STATE_FOCUSED);
 	}, LV_EVENT_DEFOCUSED, nullptr);
+
+	lv_obj_add_event_cb(sleepSlider, [](lv_event_t* event){
+		SettingsScreen* slider = static_cast<SettingsScreen*>(event->user_data);
+		if(!(lv_obj_get_state(event->target) & LV_STATE_EDITED)){
+			slider->pop();
+		}
+	}, LV_EVENT_CANCEL, this);
 
 	lv_obj_add_event_cb(sleepSlider, [](lv_event_t* event){
 		if(lv_slider_get_value(event->target) == 0){
@@ -191,6 +203,13 @@ SettingsScreen::SettingsScreen() : LVScreen(){
 	}, LV_EVENT_DEFOCUSED, nullptr);
 
 	lv_obj_add_event_cb(brightnessSlider, [](lv_event_t* event){
+		SettingsScreen* slider = static_cast<SettingsScreen*>(event->user_data);
+		if(!(lv_obj_get_state(event->target) & LV_STATE_EDITED)){
+			slider->pop();
+		}
+	}, LV_EVENT_CANCEL, this);
+
+	lv_obj_add_event_cb(brightnessSlider, [](lv_event_t* event){
 		if(lv_obj_get_state(event->target) & LV_STATE_EDITED){
 			lv_obj_add_state(lv_obj_get_parent(lv_event_get_target(event)), LV_STATE_EDITED);
 		}else{
@@ -234,6 +253,21 @@ SettingsScreen::SettingsScreen() : LVScreen(){
 	lv_obj_add_style(factoryReset, &style_focused, selFocus);
 	lv_obj_add_style(factoryReset, &style_def, sel);
 
+	lv_obj_clear_flag(factoryReset, LV_OBJ_FLAG_CLICK_FOCUSABLE);
+	lv_obj_clear_flag(factoryReset, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
+	lv_obj_clear_flag(factoryReset, LV_OBJ_FLAG_CHECKABLE);
+	lv_obj_clear_flag(factoryReset, LV_OBJ_FLAG_SCROLLABLE);
+
+	lv_obj_add_event_cb(factoryReset, [](lv_event_t* event){
+		lv_obj_t* hw =static_cast<lv_obj_t*>(event->user_data);
+		// TODO : Dodati factoryReset
+	}, LV_EVENT_CLICKED, factoryReset);
+
+	lv_obj_add_event_cb(factoryReset, [](lv_event_t* event){
+		SettingsScreen* factory = static_cast<SettingsScreen*>(event->user_data);
+			factory->pop();
+	}, LV_EVENT_CANCEL, this);
+
 	lv_group_add_obj(inputGroup, factoryReset);
 
 	lv_obj_t* factoryResetLabel = lv_label_create(factoryReset);
@@ -254,12 +288,26 @@ SettingsScreen::SettingsScreen() : LVScreen(){
 	lv_obj_add_style(HWTest, &style_focused, selFocus);
 	lv_obj_add_style(HWTest, &style_def, sel);
 
-	lv_group_add_obj(inputGroup, HWTest);
-
 	lv_obj_t* HWTestLabel = lv_label_create(HWTest);
 	lv_obj_set_style_text_font(HWTestLabel, &pixelbasic_7, 0);
 	lv_obj_set_style_text_color(HWTestLabel, lv_color_white(), 0);
 	lv_label_set_text(HWTestLabel, "Hardware test");
+	lv_obj_clear_flag(HWTest, LV_OBJ_FLAG_CLICK_FOCUSABLE);
+	lv_obj_clear_flag(HWTest, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
+	lv_obj_clear_flag(HWTest, LV_OBJ_FLAG_CHECKABLE);
+	lv_obj_clear_flag(HWTest, LV_OBJ_FLAG_SCROLLABLE);
+
+	lv_obj_add_event_cb(HWTest, [](lv_event_t* event){
+		lv_obj_t* hw =static_cast<lv_obj_t*>(event->user_data);
+		// TODO : Dodati ulazak u HW
+	}, LV_EVENT_CLICKED, HWTest);
+
+	lv_obj_add_event_cb(HWTest, [](lv_event_t* event){
+		SettingsScreen* factory = static_cast<SettingsScreen*>(event->user_data);
+		factory->pop();
+	}, LV_EVENT_CANCEL, this);
+
+	lv_group_add_obj(inputGroup, HWTest);
 
 	//Version
 	version = lv_obj_create(obj);
