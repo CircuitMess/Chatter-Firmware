@@ -126,6 +126,18 @@ SettingsScreen::SettingsScreen() : LVScreen(){
 		lv_label_set_text(((SettingsScreen*)lv_event_get_user_data(event))->sleepTimeLabel, ((SettingsScreen*)lv_event_get_user_data(event))->sleepBuf);
 	}, LV_EVENT_VALUE_CHANGED, this);
 
+	lv_obj_add_event_cb(sleepSlider, [](lv_event_t* event){
+		lv_obj_t* slider = static_cast<lv_obj_t*>(event->user_data);
+		lv_group_t* group = static_cast<lv_group_t*>(lv_obj_get_group(slider));
+		if(group == nullptr){
+			return;
+		}
+		lv_event_send(slider,LV_EVENT_RELEASED, nullptr);
+		lv_event_send(slider,LV_EVENT_SHORT_CLICKED, nullptr);
+		lv_event_send(slider,LV_EVENT_CLICKED, nullptr);
+		lv_group_send_data(group,LV_KEY_ENTER);
+	}, LV_EVENT_CANCEL, sleepSlider);
+
 	lv_group_add_obj(inputGroup, sleepSlider);
 
 	lv_slider_set_range(sleepSlider, 0, 4);
@@ -220,6 +232,18 @@ SettingsScreen::SettingsScreen() : LVScreen(){
 			lv_obj_clear_state(lv_obj_get_parent(lv_event_get_target(event)), LV_STATE_EDITED);
 		}
 	}, LV_EVENT_STYLE_CHANGED, nullptr);
+
+	lv_obj_add_event_cb(brightnessSlider, [](lv_event_t* event){
+		lv_obj_t* slider = static_cast<lv_obj_t*>(event->user_data);
+		lv_group_t* group = static_cast<lv_group_t*>(lv_obj_get_group(slider));
+		if(group == nullptr){
+			return;
+		}
+		lv_event_send(slider,LV_EVENT_RELEASED, nullptr);
+		lv_event_send(slider,LV_EVENT_SHORT_CLICKED, nullptr);
+		lv_event_send(slider,LV_EVENT_CLICKED, nullptr);
+		lv_group_send_data(group,LV_KEY_ENTER);
+	}, LV_EVENT_CANCEL, brightnessSlider);
 
 	lv_group_add_obj(inputGroup, brightnessSlider);
 
