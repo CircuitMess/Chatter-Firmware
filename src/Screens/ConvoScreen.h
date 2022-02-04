@@ -23,14 +23,24 @@ private:
 	Profile profile;
 	const UID_t convo = 0;
 
-	void send();
+	void textEntryConfirm();
+	void textEntryCancel();
+	void convoBoxEnter();
+	void convoBoxExit();
+	void messageSelected(const Message& msg);
+	void menuMessageSelected();
+	void menuMessageCancel();
+	void menuConvoSelected();
+	void menuConvoCancel();
+	void picMenuSelected();
+	void picMenuCancel();
 
 	bool loaded = false;
 
 	ConvoBox* convoBox;
-	TextEntry* entry;
+	TextEntry* textEntry;
 	PicMenu* picMenu;
-	ContextMenu* menuResend;
+	ContextMenu* menuMessage;
 	ContextMenu* menuConvo;
 
 	Message selectedMessage;

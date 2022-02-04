@@ -279,7 +279,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 	}
 
 	if(lv_obj_check_type(obj, &lv_obj_class)){
-		lv_obj_add_style(obj, &styles->card, 0);
+		// lv_obj_add_style(obj, &styles->card, 0);
 		lv_obj_add_style(obj, &styles->scrollbar, LV_PART_SCROLLBAR);
 	}
 	else if(lv_obj_check_type(obj, &lv_slider_class)){
