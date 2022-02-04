@@ -95,6 +95,7 @@ SettingsScreen::SettingsScreen() : LVScreen(){
 	lv_obj_t* sleepLabel = lv_label_create(sleepTime);
 	lv_obj_set_style_text_font(sleepLabel, &pixelbasic_7, 0);
 	lv_obj_set_style_text_color(sleepLabel, lv_color_white(), 0);
+	lv_obj_set_style_pad_top(sleepLabel, 2, 0);
 	lv_label_set_text(sleepLabel, "Sleep Timeout");
 
 	sleepSlider = lv_slider_create(sleepTime);
@@ -116,11 +117,12 @@ SettingsScreen::SettingsScreen() : LVScreen(){
 
 	lv_obj_add_event_cb(sleepSlider, [](lv_event_t* event){
 		if(lv_slider_get_value(event->target) == 0){
-			sprintf(((SettingsScreen*)lv_event_get_user_data(event))->sleepBuf,"OFF");
+			sprintf(((SettingsScreen*)lv_event_get_user_data(event))->sleepBuf,"#892eff OFF");
 
 		}else{
-			sprintf(((SettingsScreen*)lv_event_get_user_data(event))->sleepBuf,"%d min", lv_slider_get_value(event->target)*5);
+			sprintf(((SettingsScreen*)lv_event_get_user_data(event))->sleepBuf,"#892eff %d min", lv_slider_get_value(event->target)*5);
 		}
+		lv_label_set_recolor(((SettingsScreen*)lv_event_get_user_data(event))->sleepTimeLabel,true);
 		lv_label_set_text(((SettingsScreen*)lv_event_get_user_data(event))->sleepTimeLabel, ((SettingsScreen*)lv_event_get_user_data(event))->sleepBuf);
 	}, LV_EVENT_VALUE_CHANGED, this);
 
@@ -138,10 +140,11 @@ SettingsScreen::SettingsScreen() : LVScreen(){
 	lv_obj_set_style_text_color(sleepTimeLabel, lv_color_black(), 0);
 	lv_obj_set_style_pad_top(sleepTimeLabel,1,0);
 	if(Settings.get().sleepTime == 0){
-		sprintf(sleepBuf,"OFF");
+		sprintf(sleepBuf,"#892eff OFF");
 	}else{
-		sprintf(sleepBuf, "%d min", (Settings.get().sleepTime) * 5);
+		sprintf(sleepBuf, "#892eff %d min", (Settings.get().sleepTime) * 5);
 	}
+	lv_label_set_recolor(sleepTimeLabel, true);
 	lv_label_set_text(sleepTimeLabel, sleepBuf);
 
 	lv_obj_add_event_cb(sleepSlider, [](lv_event_t* event){
@@ -187,6 +190,7 @@ SettingsScreen::SettingsScreen() : LVScreen(){
 	lv_obj_t* brightnessLabel = lv_label_create(screenBrightness);
 	lv_obj_set_style_text_font(brightnessLabel, &pixelbasic_7, 0);
 	lv_obj_set_style_text_color(brightnessLabel, lv_color_white(), 0);
+	lv_obj_set_style_pad_top(brightnessLabel, 2, 0);
 	lv_label_set_text(brightnessLabel, "Brightness");
 
 	brightnessSlider = lv_slider_create(screenBrightness);
@@ -220,7 +224,7 @@ SettingsScreen::SettingsScreen() : LVScreen(){
 	lv_group_add_obj(inputGroup, brightnessSlider);
 
 	lv_obj_add_event_cb(brightnessSlider, [](lv_event_t* event){
-		lv_obj_t* slider = static_cast<lv_obj_t*>(event->user_data);;
+		lv_obj_t* slider = static_cast<lv_obj_t*>(event->user_data);
 		Settings.get().screenBrightness= lv_slider_get_value(slider);
 	}, LV_EVENT_VALUE_CHANGED, brightnessSlider);
 
