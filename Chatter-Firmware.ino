@@ -119,6 +119,7 @@ void boot(){
 
 	LoRa.begin();
 
+	Profiles.randomizeMyProfile();
 	//loadMock(true);
 	//printData();
 
