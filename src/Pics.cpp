@@ -5,6 +5,15 @@ const Pic Pics[NUM_PICS] = {
 		{ "1.bin" },
 		{ "2.bin" },
 		{ "3.bin" }
+/*		{ "4.gif" },
+		{ "5.gif" },
+		{ "6.gif" },
+		{ "7.gif" },
+		{ "8.gif" },
+		{ "9.gif" },
+		{ "10.gif" },
+		{ "11.gif" },
+		{ "12.gif" }*/
 
 };
 
