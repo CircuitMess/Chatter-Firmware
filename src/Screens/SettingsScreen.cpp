@@ -79,8 +79,10 @@ SettingsScreen::SettingsScreen() : LVScreen(){
 	lv_obj_clear_flag(soundSwitch, LV_OBJ_FLAG_CHECKABLE);
 
 	lv_obj_add_event_cb(soundSwitch, [](lv_event_t* event){
+		lv_obj_t* obj = static_cast<lv_obj_t*>(event->user_data);
 		lv_obj_add_state(lv_obj_get_parent(lv_event_get_target(event)), LV_STATE_FOCUSED);
-	}, LV_EVENT_FOCUSED, nullptr);
+		lv_obj_scroll_to_y(obj,0,LV_ANIM_OFF);
+	}, LV_EVENT_FOCUSED, obj);
 
 	lv_obj_add_event_cb(soundSwitch, [](lv_event_t* event){
 		lv_obj_clear_state(lv_obj_get_parent(lv_event_get_target(event)), LV_STATE_FOCUSED);
