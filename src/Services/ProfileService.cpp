@@ -31,6 +31,23 @@ void ProfileService::loop(uint micros){
 void ProfileService::begin(){
 	LoopManager::addListener(this);
 
+	Friend fren = Storage.Friends.get(ESP.getEfuseMac());
+	if(fren.uid == 0){
+		Profile defaultProfile = Profile{};
+		strncpy(defaultProfile.nickname, nameList[LoRa.rand(sizeof(nameList) / sizeof(nameList[0]))], 15);
+		defaultProfile.avatar = LoRa.rand(15);
+		defaultProfile.hue = LoRa.rand(360);
+
+		fren.profile = defaultProfile;
+		fren.uid = ESP.getEfuseMac();
+		if(!Storage.Friends.add(fren)){
+			printf("Error applying default profile\n");
+		}
+		myProfile = defaultProfile;
+	}else{
+		myProfile = fren.profile;
+	}
+	myHash = generateHash(myProfile);
 }
 
 void ProfileService::sendResponse(UID_t receiver){
@@ -103,25 +120,5 @@ void ProfileService::sendRequest(UID_t receiver){
 
 size_t ProfileService::getMyHash() const{
 	return myHash;
-}
-
-void ProfileService::randomizeMyProfile(){
-	Friend fren = Storage.Friends.get(ESP.getEfuseMac());
-	if(fren.uid == 0){
-		Profile defaultProfile = Profile{};
-		strncpy(defaultProfile.nickname, nameList[LoRa.rand(sizeof(nameList) / sizeof(nameList[0]))], 15);
-		defaultProfile.avatar = LoRa.rand(15);
-		defaultProfile.hue = LoRa.rand(360);
-
-		fren.profile = defaultProfile;
-		fren.uid = ESP.getEfuseMac();
-		if(!Storage.Friends.add(fren)){
-			printf("Error applying default profile\n");
-		}
-		myProfile = defaultProfile;
-	}else{
-		myProfile = fren.profile;
-		myHash = generateHash(myProfile);
-	}
 }
 
