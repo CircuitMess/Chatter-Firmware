@@ -49,8 +49,6 @@ SettingsScreen::SettingsScreen() : LVScreen(){
 	lv_obj_set_style_pad_gap(version, 8, 0);
 	lv_obj_set_style_pad_all(version, 3, 0);
 	lv_obj_set_style_bg_opa(version, 0, 0);
-	lv_obj_add_flag(version, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
-	lv_group_add_obj(inputGroup, version);
 
 
 	lv_obj_t* versionLabel = lv_label_create(version);
