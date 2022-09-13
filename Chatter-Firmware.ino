@@ -162,6 +162,17 @@ bool checkJig(){
 	return false;
 }
 
+void initLog(){
+	esp_log_level_set("*", ESP_LOG_NONE);
+	return;
+
+	const static auto tags = { "*" };
+
+	for(const char* tag : tags){
+		esp_log_level_set(tag, ESP_LOG_VERBOSE);
+	}
+}
+
 void setup(){
 	Serial.begin(115200);
 
@@ -169,6 +180,8 @@ void setup(){
 
 	Chatter.begin(false);
 	display = Chatter.getDisplay();
+
+	initLog();
 
 	if(checkJig()){
 		printf("Jig\n");
