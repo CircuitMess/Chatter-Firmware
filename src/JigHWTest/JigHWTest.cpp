@@ -2,13 +2,13 @@
 #include <Battery/BatteryService.h>
 #include <TypeDef.h>
 #include <modules/LLCC68/LLCC68.h>
-#include <Settings.h>
 #include "JigHWTest.h"
 #include "SPIFFSChecksum.hpp"
+#include "../Services/BuzzerService.h"
 #include <Pins.hpp>
 #include <Chatter.h>
-#include <soc/efuse_reg.h>
-#include <esp_efuse.h>
+#include <Notes.h>
+#include <Util/HWRevision.h>
 
 JigHWTest *JigHWTest::test = nullptr;
 
@@ -16,9 +16,10 @@ JigHWTest::JigHWTest(Display* display) : display(display), canvas(display->getBa
 	test = this;
 
 	tests.push_back({JigHWTest::LoRaTest, "LoRa", [](){ }});
-	tests.push_back({JigHWTest::BatteryCalib, "Bat calib", [](){}});
 	tests.push_back({JigHWTest::BatteryCheck, "Bat check", [](){}});
 	tests.push_back({JigHWTest::SPIFFSTest, "SPIFFS", [](){ }});
+	tests.push_back({JigHWTest::buttons, "Buttons", [](){ }});
+	tests.push_back({JigHWTest::hwRevision, "HW rev"});
 }
 
 void JigHWTest::start(){
@@ -51,8 +52,8 @@ void JigHWTest::start(){
 
 		bool result = test.test();
 
-		canvas->setTextColor(result ? TFT_GREEN : TFT_RED);
-		canvas->printf("%s\n", result ? "PASSED" : "FAILED");
+		canvas->setTextColor(result ? TFT_SILVER : TFT_ORANGE);
+		canvas->printf("%s\n", result ? "PASS" : "FAIL");
 		display->commit();
 
 		Serial.printf("TEST:endTest:%s\n", result ? "pass" : "fail");
@@ -66,17 +67,57 @@ void JigHWTest::start(){
 		}
 	}
 
-	if(!pass){
+
+	if(pass){
+		Serial.println("TEST:passall");
+	}else{
 		Serial.printf("TEST:fail:%s\n", currentTest);
-		for(;;);
 	}
 
-	Serial.println("TEST:passall");
-
 	canvas->print("\n\n");
-	canvas->setTextColor(TFT_GREEN);
-	canvas->printCenter("All OK!");
+	canvas->setTextColor(pass ? TFT_BLUE : TFT_ORANGE);
+	canvas->printCenter(pass ? "All OK!" : "FAIL!");
 	display->commit();
+
+	bool painted = false;
+	const auto color = pass ? TFT_GREEN : TFT_RED;
+	auto flashTime = 0;
+	bool tone = false;
+	const auto note = NOTE_C6 + ((rand() * 20) % 400) - 200;
+	for(;;){
+		if(millis() - flashTime >= 500){
+			for(int x = 0; x < canvas->width(); x++){
+				for(int y = 0; y <  canvas->height(); y++){
+					if(!painted && canvas->readPixel(x, y) == TFT_BLACK){
+						canvas->drawPixel(x, y, color);
+					}else if(painted && canvas->readPixel(x, y) == color){
+						canvas->drawPixel(x, y, TFT_BLACK);
+					}
+				}
+			}
+
+			flashTime = millis();
+			painted = !painted;
+			display->commit();
+		}
+
+		LoopManager::loop();
+		auto press = false;
+		for(int i = 0; i < ButtonCount; i++){
+			if(Chatter.getInput()->getButtonState(i)){
+				press = true;
+				break;
+			}
+		}
+
+		if(press && !tone){
+			Piezo.tone(note);
+			tone = true;
+		}else if(!press && tone){
+			Piezo.noTone();
+			tone = false;
+		}
+	}
 }
 
 void JigHWTest::log(const char* property, const char* value){
@@ -107,6 +148,10 @@ void JigHWTest::log(const char* property, const String& value){
 	Serial.printf("%s:%s:%s\n", currentTest, property, value.c_str());
 }
 
+void JigHWTest::prompt(){
+	Serial.printf("TEST:prompt:1\n");
+}
+
 bool JigHWTest::LoRaTest(){
 	LLCC68 radio(new Module(RADIO_CS, RADIO_DIO1, RADIO_RST, RADIO_BUSY, Chatter.getSPILoRa()));
 	int state = radio.begin(868, 500, 9, 5, RADIOLIB_SX126X_SYNC_WORD_PRIVATE, 22, 8, 0, false);
@@ -118,51 +163,13 @@ bool JigHWTest::LoRaTest(){
 	return true;
 }
 
-bool JigHWTest::BatteryCalib(){
-	if(Battery.getVoltOffset() != 0){
-		test->log("calibrated", Battery.getVoltOffset());
-		Chatter.getDisplay()->getBaseSprite()->print("fused. ");
-		return true;
-	}
-
-	constexpr uint16_t numReadings = 100;
-	constexpr uint16_t readDelay = 50;
-	int32_t val = 0;
-
-	for(int i = 0; i < numReadings; i++){
-		val += analogRead(BATTERY_PIN);
-		delay(readDelay);
-	}
-	val /= numReadings;
-
-	val = Battery.mapReading(val);
-	constexpr int16_t ref = 3597;
-
-	int16_t offset = ref - val;
-
-	test->log("reading", val);
-	test->log("offset", offset);
-
-	uint16_t offsetLow = offset & 0b01111111;
-	uint16_t offsetHigh = offset >> 7;
-	REG_SET_FIELD(EFUSE_BLK3_WDATA3_REG, EFUSE_ADC1_TP_LOW, offsetLow);
-	REG_SET_FIELD(EFUSE_BLK3_WDATA3_REG, EFUSE_ADC1_TP_HIGH, offsetHigh);
-	esp_efuse_burn_new_values();
-	esp_efuse_reset();
-
-	return true;
-}
-
 bool JigHWTest::BatteryCheck(){
+	Battery.begin();
 	uint16_t voltage = Battery.getVoltage();
-	uint8_t percentage = Battery.getPercentage();
-	uint8_t level = Battery.getLevel();
-	if(voltage < referenceVoltage - 50 || voltage > referenceVoltage + 50){
-		test->log("level", (uint32_t) level);
-		test->log("percentage", (uint32_t) percentage);
+
+	if(voltage < referenceVoltage - 100 || voltage > referenceVoltage + 100){
 		test->log("voltage", (uint32_t) voltage);
 		test->log("offset", Battery.getVoltOffset());
-		test->log("raw", (uint32_t) (voltage - Battery.getVoltOffset()));
 		return false;
 	}
 
@@ -209,4 +216,87 @@ uint32_t JigHWTest::calcChecksum(File& file){
 	return sum;
 }
 
+bool JigHWTest::buttons(){
+	test->prompt();
+	auto input = Chatter.getInput();
+
+	const auto cX = test->canvas->getCursorX();
+	const auto cY = test->canvas->getCursorY();
+	bool flash = false;
+	uint32_t flashTime = 0;
+
+	std::vector<bool> pressed(ButtonCount, false);
+	std::vector<bool> released(ButtonCount, false);
+	uint8_t pressCount = 0;
+	uint8_t releaseCount = 0;
+	for(;;){
+		LoopManager::loop();
+
+		for(int i = 0; i < ButtonCount; i++){
+			if(input->getButtonState(i) && !pressed[i]){
+				pressed[i] = true;
+				pressCount++;
+			}else if(!input->getButtonState(i) && pressed[i] && !released[i]){
+				released[i] = true;
+				releaseCount++;
+			}
+		}
+
+		if(pressCount == ButtonCount && releaseCount == ButtonCount) break;
+
+		if(millis() - flashTime > 500){
+			if(flash){
+				test->canvas->fillRect(cX, cY-4, 120, 8, TFT_BLACK);
+			}else{
+				test->canvas->setCursor(cX, cY);
+				test->canvas->setTextColor(TFT_GOLD);
+				test->canvas->printf("- PRESS BUTTONS -");
+			}
+
+			Chatter.getDisplay()->commit();
+			flash = !flash;
+			flashTime = millis();
+		}
+
+		test->canvas->fillRect(cX, cY+6, 120, 8, TFT_BLACK);
+		test->canvas->setTextColor(TFT_LIGHTGRAY);
+		test->canvas->setCursor(cX-3, cY+10);
+		test->canvas->printf("[");
+		for(int i = 0; i < ButtonCount; i++){
+			if(input->getButtonState(i)){
+				test->canvas->setTextColor(TFT_GOLD);
+			}else if(pressed[i] && released[i]){
+				test->canvas->setTextColor(TFT_BLUE);
+			}else{
+				test->canvas->setTextColor(TFT_DARKGRAY);
+			}
+			test->canvas->printf("-");
+		}
+		test->canvas->setTextColor(TFT_LIGHTGRAY);
+		test->canvas->printf("]");
+
+		Chatter.getDisplay()->commit();
+	}
+
+	test->canvas->fillRect(cX-3, cY-4, 120, 20, TFT_BLACK);
+	test->canvas->setCursor(cX, cY);
+	return pressCount == ButtonCount && releaseCount == ButtonCount;
+}
+
+bool JigHWTest::hwRevision(){
+	const auto rev = HWRevision::get();
+	if(rev != 0){
+		test->canvas->printf("Fused: ");
+		test->canvas->setTextColor(TFT_GOLD);
+		test->canvas->printf("%d ", rev);
+		test->canvas->setTextColor(TFT_WHITE);
+
+		return rev == CurrentVersion;
+	}
+
+	HWRevision::write(CurrentVersion);
+	HWRevision::commit();
+
+	return true;
+}
 

@@ -34,15 +34,21 @@ private:
 	void log(const char *property, uint32_t value);
 	void log(const char *property, int32_t value);
 	void log(const char *property, const String& value);
+	void prompt();
 
 	static bool LoRaTest();
-	static bool BatteryCalib();
 	static bool BatteryCheck();
 	static bool SPIFFSTest();
+	static bool buttons();
+	static bool hwRevision();
 
 	static uint32_t calcChecksum(fs::File& file);
 
-	static const int16_t referenceVoltage = 3597;
+	static const int16_t referenceVoltage = 4800;
+
+	static constexpr uint8_t ButtonCount = 16;
+
+	static constexpr uint8_t CurrentVersion = 1;
 };
 
 #endif //CHATTER_FIRMWARE_JIGHWTEST_H
