@@ -11,7 +11,6 @@
 #include "../Services/MessageService.h"
 #include <Settings.h>
 #include "../FSLVGL.h"
-#include "LockScreen.h"
 
 ProfileScreen::ProfileScreen(UID_t uid, bool editable) : LVScreen(), editable(editable), frend(Storage.Friends.get(uid)), profile(frend.profile){
 //styles
@@ -212,12 +211,8 @@ void ProfileScreen::onStop(){
 }
 
 void ProfileScreen::buttonPressed(uint i){
-	if((!prompt || !prompt->isActive()) && (!menu || !menu->isActive()) && (!name || !name->isActive()) && ((editable && !lv_group_get_editing(inputGroup)) || !editable)){
-		if(i == BTN_BACK){
-			pop();
-		}else if(i == BTN_R){
-			LockScreen::activate(this);
-		}
+	if((!prompt || !prompt->isActive()) && (!menu || !menu->isActive()) && i == BTN_BACK && (!name || !name->isActive()) && ((editable && !lv_group_get_editing(inputGroup)) || !editable)){
+		pop();
 	}
 }
 

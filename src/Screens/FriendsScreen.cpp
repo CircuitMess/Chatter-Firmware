@@ -1,4 +1,3 @@
-#include <Pins.hpp>
 #include "FriendsScreen.h"
 #include "../Model/Profile.hpp"
 #include "../Fonts/font.h"
@@ -8,8 +7,6 @@
 #include "../Elements/ListItem.h"
 #include "PairScreen.h"
 #include "ProfileScreen.h"
-#include "LockScreen.h"
-#include <Input/Input.h>
 
 FriendsScreen::FriendsScreen() : LVScreen(), apop(this){
 	lv_obj_set_height(obj, LV_SIZE_CONTENT);
@@ -32,12 +29,10 @@ FriendsScreen::FriendsScreen() : LVScreen(), apop(this){
 
 void FriendsScreen::onStart(){
 	apop.start();
-	Input::getInstance()->addListener(this);
 }
 
 void FriendsScreen::onStop(){
 	apop.stop();
-	Input::getInstance()->removeListener(this);
 }
 
 void FriendsScreen::onStarting(){
@@ -74,11 +69,5 @@ void FriendsScreen::onStarting(){
 		}, LV_EVENT_PRESSED, this);
 
 		elements.push_back(user);
-	}
-}
-
-void FriendsScreen::buttonPressed(uint i){
-	if(i == BTN_R){
-		LockScreen::activate(this);
 	}
 }

@@ -1,4 +1,3 @@
-#include <Pins.hpp>
 #include "InboxScreen.h"
 #include "../Elements/UserWithMessage.h"
 #include "../Fonts/font.h"
@@ -6,8 +5,6 @@
 #include "ConvoScreen.h"
 #include "../Elements/ListItem.h"
 #include "PairScreen.h"
-#include "LockScreen.h"
-#include <Input/Input.h>
 
 InboxScreen::InboxScreen() : LVScreen(), apop(this){
 	lv_obj_set_height(obj, LV_SIZE_CONTENT);
@@ -66,7 +63,6 @@ void InboxScreen::openConvo(UID_t uid){
 
 void InboxScreen::onStart(){
 	apop.start();
-	Input::getInstance()->addListener(this);
 }
 
 void InboxScreen::onStarting(){
@@ -101,11 +97,4 @@ void InboxScreen::onStarting(){
 
 void InboxScreen::onStop(){
 	apop.stop();
-	Input::getInstance()->removeListener(this);
-}
-
-void InboxScreen::buttonPressed(uint i){
-	if(i == BTN_R){
-		LockScreen::activate(this);
-	}
 }

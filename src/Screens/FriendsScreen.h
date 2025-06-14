@@ -6,7 +6,7 @@
 #include "../AutoPop.h"
 #include "../Elements/User.h"
 
-class FriendsScreen : public LVScreen, private InputListener {
+class FriendsScreen : public LVScreen{
 public:
 	FriendsScreen();
 
@@ -18,8 +18,6 @@ private:
 	AutoPop apop;
 
 	std::vector<User*> elements;
-
-	void buttonPressed(uint i) override;
 
 };
 

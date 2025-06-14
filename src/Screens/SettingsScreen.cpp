@@ -11,7 +11,6 @@
 #include "../Modals/Prompt.h"
 #include <Audio/Piezo.h>
 #include "../Services/BuzzerService.h"
-#include "LockScreen.h"
 #include <Notes.h>
 #include <nvs_flash.h>
 
@@ -59,7 +58,7 @@ SettingsScreen::SettingsScreen() : LVScreen(){
 	lv_obj_t* versionLabel = lv_label_create(version);
 	lv_obj_set_style_text_font(versionLabel, &pixelbasic7, 0);
 	lv_obj_set_style_text_color(versionLabel, lv_color_white(), 0);
-	lv_label_set_text(versionLabel, "Chatter 2.0 Settings");
+	lv_label_set_text(versionLabel, "Chatter v2.0 Settings");
 
 	//sound ON/OFF
 	sound = lv_obj_create(obj);
@@ -354,10 +353,12 @@ SettingsScreen::SettingsScreen() : LVScreen(){
 
 	lv_obj_add_event_cb(brightnessSlider, [](lv_event_t* event){
 		lv_obj_add_state(lv_obj_get_parent(lv_event_get_target(event)), LV_STATE_FOCUSED);
+		Input::getInstance()->addListener(static_cast<SettingsScreen*>(lv_event_get_user_data(event)));
 	}, LV_EVENT_FOCUSED, this);
 
 	lv_obj_add_event_cb(brightnessSlider, [](lv_event_t* event){
 		lv_obj_clear_state(lv_obj_get_parent(lv_event_get_target(event)), LV_STATE_FOCUSED);
+		Input::getInstance()->removeListener(static_cast<SettingsScreen*>(lv_event_get_user_data(event)));
 	}, LV_EVENT_DEFOCUSED, this);
 
 	lv_obj_add_event_cb(brightnessSlider, [](lv_event_t* event){
@@ -514,10 +515,6 @@ void SettingsScreen::onStarting(){
 
 }
 
-void SettingsScreen::onStart(){
-	Input::getInstance()->addListener(this);
-}
-
 void SettingsScreen::onStop(){
 	Settings.get().sound = lv_obj_get_state(soundSwitch) & LV_STATE_CHECKED;
 	Settings.get().sleepTime = lv_slider_get_value(sleepSlider);
@@ -525,7 +522,6 @@ void SettingsScreen::onStop(){
 	Settings.get().screenBrightness = lv_slider_get_value(brightnessSlider) * 5;
 	Settings.store();
 	Sleep.updateTimes();
-	Input::getInstance()->removeListener(this);
 }
 
 void SettingsScreen::buttonHeldRepeat(uint i, uint repeatCount){
@@ -552,15 +548,5 @@ void SettingsScreen::buttonHeld(uint i){
 
 	if(i == BTN_LEFT || i == BTN_RIGHT){
 		heldThresh = true;
-	}
-}
-
-void SettingsScreen::buttonPressed(uint i){
-	if(lv_obj_has_state(brightnessSlider, LV_STATE_EDITED)
-		|| lv_obj_has_state(sleepSlider, LV_STATE_EDITED)
-		|| lv_obj_has_state(shutdownSlider, LV_STATE_EDITED)) return;
-
-	if(i == BTN_R){
-		LockScreen::activate(this);
 	}
 }
