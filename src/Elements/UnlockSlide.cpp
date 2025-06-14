@@ -1,4 +1,5 @@
 #include "UnlockSlide.h"
+#include "../Fonts/font.h"
 #include <utility>
 #include <Loop/LoopManager.h>
 #include <font/lv_font.h>
@@ -9,15 +10,15 @@ UnlockSlide::UnlockSlide(lv_obj_t* parent, std::function<void()> onDone) : LVObj
 	lv_obj_set_style_pad_ver(obj, 3, 0);
 
 	text = lv_label_create(obj);
-	lv_label_set_text(text, "Hold    to unlock");
-	lv_obj_set_style_text_font(text, &lv_font_unscii_8, 0);
-	lv_obj_set_style_text_color(text, lv_color_white(), 0);
-	lv_obj_set_align(text, LV_ALIGN_BOTTOM_RIGHT);
-	lv_obj_set_x(text, -2);
+	lv_label_set_text(text, "Hold        to unlock...");
+	lv_obj_set_style_text_font(text, &pixelbasic7, 0);
+	lv_obj_set_style_text_color(text, lv_color_make(220, 220, 220), 0);
+	lv_obj_set_align(text, LV_ALIGN_BOTTOM_LEFT);
+	lv_obj_set_x(text, 14);
 
 	icon = lv_img_create(obj);
 	lv_img_set_src(icon, "S:/Lock/Icon.bin");
-	lv_obj_set_pos(icon, 54, 5);
+	lv_obj_set_pos(icon, 41, 5);
 
 	lock = lv_img_create(obj);
 	lv_img_set_src(lock, "S:/Lock/Locked.bin");
@@ -29,11 +30,15 @@ void UnlockSlide::start(){
 	lv_img_set_src(lock, "S:/Lock/Unlocked.bin");
 	state = Slide;
 	t = 0;
+	lv_obj_add_flag(icon, LV_OBJ_FLAG_HIDDEN);
+	lv_obj_add_flag(text, LV_OBJ_FLAG_HIDDEN);
 }
 
 void UnlockSlide::stop(){
 	LoopManager::removeListener(this);
 	state = Idle;
+	lv_obj_clear_flag(icon, LV_OBJ_FLAG_HIDDEN);
+	lv_obj_clear_flag(text, LV_OBJ_FLAG_HIDDEN);
 }
 
 void UnlockSlide::shake(){
