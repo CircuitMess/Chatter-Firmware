@@ -77,6 +77,11 @@ resleep:
 		delay(10);
 	}
 
+	if(shutdownTime == 0){
+		turnOff();
+		ESP.restart(); // Just in case
+	}
+
 	gotMessage = false;
 	Messages.addReceivedListener(this);
 
