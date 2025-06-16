@@ -72,6 +72,8 @@ void SleepService::enterSleep(){
 	display->getBaseSprite()->clear(TFT_BLACK);
 	display->commit();
 
+	const uint32_t sleepStart = millis();
+
 resleep:
 	while(LoRa.working){
 		delay(10);
@@ -91,28 +93,36 @@ resleep:
 	esp_sleep_enable_gpio_wakeup();
 	gpio_wakeup_enable((gpio_num_t) RADIO_DIO1, GPIO_INTR_HIGH_LEVEL);
 
-	// GPIO wakeup
-	esp_sleep_enable_ext1_wakeup((uint64_t) 1 << PIN_WAKE, ESP_EXT1_WAKEUP_ALL_LOW);
-
 	// Timer wakeup
-	if(shutdownTime != 0){
-		esp_sleep_enable_timer_wakeup((uint64_t) shutdownTime * (uint64_t) 1000000);
-	}
+	esp_sleep_enable_timer_wakeup((uint64_t) 2000000); // Wake every 2 seconds and check buttons
 
 	// Sleep
 	esp_light_sleep_start();
 
 	// Awake here
-	rtc_gpio_deinit((gpio_num_t) PIN_WAKE);
-
 	auto cause = esp_sleep_get_wakeup_cause();
 
-	enum Reason { Button, Radio, Timeout };
-	const Reason reason = cause == ESP_SLEEP_WAKEUP_GPIO ? Radio : (cause == ESP_SLEEP_WAKEUP_TIMER ? Timeout : Button);
+	enum Reason { Radio, Timeout };
+	const Reason reason = cause == ESP_SLEEP_WAKEUP_GPIO ? Radio : Timeout;
 
-	if(shutdownTime != 0 && reason == Timeout){
-		turnOff();
-		ESP.restart(); // Just in case
+	if(reason == Timeout){
+		Chatter.getInput()->loop(100);
+		Chatter.getInput()->loop(100);
+
+		bool press = false;
+		for(int i = 0; i < 16; i++){
+			press |= Chatter.getInput()->getButtonState(i);
+			if(press) break;
+		}
+
+		if(!press){
+			if(millis() - sleepStart >= shutdownTime * 1000){
+				turnOff();
+				ESP.restart(); // Just in case
+			}else{
+				goto resleep;
+			}
+		}
 	}
 
 	do {
