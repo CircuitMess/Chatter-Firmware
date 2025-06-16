@@ -16,6 +16,7 @@
 #include "src/Services/ProfileService.h"
 #include "src/Screens/UserHWTest.h"
 #include <Settings.h>
+#include <Util/HWRevision.h>
 #include "src/Services/SleepService.h"
 #include "src/Services/ShutdownService.h"
 #include "src/Services/BuzzerService.h"
@@ -229,19 +230,24 @@ void setup(){
 	printf("UID: 0x%llx\n", ESP.getEfuseMac());
 
 	if(!Settings.get().tested){
-		FSLVGL::loadCache();
-
-		auto test = new UserHWTest([](){
+		if(HWRevision::get() > 0){
 			Settings.get().tested = true;
 			Settings.store();
-			Chatter.fadeOut();
-			boot();
-		});
+		}else{
+			FSLVGL::loadCache();
 
-		test->start();
-		lv_timer_handler();
-		Chatter.fadeIn();
-		return;
+			auto test = new UserHWTest([](){
+				Settings.get().tested = true;
+				Settings.store();
+				Chatter.fadeOut();
+				boot();
+			});
+
+			test->start();
+			lv_timer_handler();
+			Chatter.fadeIn();
+			return;
+		}
 	}
 
 	boot();
