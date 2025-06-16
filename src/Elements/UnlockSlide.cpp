@@ -37,8 +37,11 @@ void UnlockSlide::start(){
 void UnlockSlide::stop(){
 	LoopManager::removeListener(this);
 	state = Idle;
-	lv_obj_clear_flag(icon, LV_OBJ_FLAG_HIDDEN);
-	lv_obj_clear_flag(text, LV_OBJ_FLAG_HIDDEN);
+
+	if(!unlocked){
+		lv_obj_clear_flag(icon, LV_OBJ_FLAG_HIDDEN);
+		lv_obj_clear_flag(text, LV_OBJ_FLAG_HIDDEN);
+	}
 }
 
 void UnlockSlide::shake(){
@@ -73,6 +76,7 @@ void UnlockSlide::loop(uint32_t dt){
 		state = Idle;
 
 		if(oldState == Slide){
+			unlocked = true;
 			onDone();
 		}
 	}

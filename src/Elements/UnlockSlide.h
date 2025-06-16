@@ -27,6 +27,7 @@ private:
 	lv_obj_t* lock;
 
 	std::function<void()> onDone;
+	bool unlocked = false;
 
 	float t = 0;
 	void repos();
