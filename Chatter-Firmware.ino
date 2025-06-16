@@ -222,6 +222,7 @@ void setup(){
 	displayDriver.ver_res = 128;
 	displayDriver.flush_cb = lvglFlush;
 	displayDriver.draw_buf = &drawBuffer;
+	displayDriver.full_refresh = true;
 	lv_disp_t * disp = lv_disp_drv_register(&displayDriver);
 	chatterThemeInit(disp);
 
