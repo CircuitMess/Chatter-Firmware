@@ -13,6 +13,7 @@
 #include "../Services/BuzzerService.h"
 #include <Notes.h>
 #include <nvs_flash.h>
+#include <Util/HWRevision.h>
 
 
 SettingsScreen::SettingsScreen() : LVScreen(){
@@ -458,39 +459,41 @@ SettingsScreen::SettingsScreen() : LVScreen(){
 	lv_label_set_text(factoryResetLabel, "Factory reset");
 
 	//HWtest
-	HWTest = lv_obj_create(obj);
-	lv_obj_set_height(HWTest, LV_SIZE_CONTENT);
-	lv_obj_set_width(HWTest, lv_pct(100));
-	lv_obj_set_layout(HWTest, LV_LAYOUT_FLEX);
-	lv_obj_set_flex_flow(HWTest, LV_FLEX_FLOW_ROW);
-	lv_obj_set_flex_align(HWTest, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-	lv_obj_set_style_pad_gap(HWTest, 8, 0);
-	lv_obj_set_style_pad_all(HWTest, 3, 0);
-	lv_obj_set_style_bg_opa(HWTest, 0, 0);
-	lv_obj_add_style(HWTest, &style_focused, selFocus);
-	lv_obj_add_style(HWTest, &style_def, sel);
-	lv_obj_add_flag(HWTest, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
+	if(HWRevision::get() <= 0){
+		HWTest = lv_obj_create(obj);
+		lv_obj_set_height(HWTest, LV_SIZE_CONTENT);
+		lv_obj_set_width(HWTest, lv_pct(100));
+		lv_obj_set_layout(HWTest, LV_LAYOUT_FLEX);
+		lv_obj_set_flex_flow(HWTest, LV_FLEX_FLOW_ROW);
+		lv_obj_set_flex_align(HWTest, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+		lv_obj_set_style_pad_gap(HWTest, 8, 0);
+		lv_obj_set_style_pad_all(HWTest, 3, 0);
+		lv_obj_set_style_bg_opa(HWTest, 0, 0);
+		lv_obj_add_style(HWTest, &style_focused, selFocus);
+		lv_obj_add_style(HWTest, &style_def, sel);
+		lv_obj_add_flag(HWTest, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
 
 
-	lv_obj_t* HWTestLabel = lv_label_create(HWTest);
-	lv_obj_set_style_text_font(HWTestLabel, &pixelbasic7, 0);
-	lv_obj_set_style_text_color(HWTestLabel, lv_color_white(), 0);
-	lv_label_set_text(HWTestLabel, "Hardware test");
-	lv_obj_clear_flag(HWTest, LV_OBJ_FLAG_CLICK_FOCUSABLE);
-	lv_obj_clear_flag(HWTest, LV_OBJ_FLAG_CHECKABLE);
-	lv_obj_clear_flag(HWTest, LV_OBJ_FLAG_SCROLLABLE);
+		lv_obj_t* HWTestLabel = lv_label_create(HWTest);
+		lv_obj_set_style_text_font(HWTestLabel, &pixelbasic7, 0);
+		lv_obj_set_style_text_color(HWTestLabel, lv_color_white(), 0);
+		lv_label_set_text(HWTestLabel, "Hardware test");
+		lv_obj_clear_flag(HWTest, LV_OBJ_FLAG_CLICK_FOCUSABLE);
+		lv_obj_clear_flag(HWTest, LV_OBJ_FLAG_CHECKABLE);
+		lv_obj_clear_flag(HWTest, LV_OBJ_FLAG_SCROLLABLE);
 
-	lv_obj_add_event_cb(HWTest, [](lv_event_t* event){
-		auto* settings = static_cast<SettingsScreen*>(event->user_data);
-		settings->push(new UserHWTest());
-	}, LV_EVENT_CLICKED, this);
+		lv_obj_add_event_cb(HWTest, [](lv_event_t* event){
+			auto* settings = static_cast<SettingsScreen*>(event->user_data);
+			settings->push(new UserHWTest());
+		}, LV_EVENT_CLICKED, this);
 
-	lv_obj_add_event_cb(HWTest, [](lv_event_t* event){
-		SettingsScreen* factory = static_cast<SettingsScreen*>(event->user_data);
-		factory->pop();
-	}, LV_EVENT_CANCEL, this);
+		lv_obj_add_event_cb(HWTest, [](lv_event_t* event){
+			SettingsScreen* factory = static_cast<SettingsScreen*>(event->user_data);
+			factory->pop();
+		}, LV_EVENT_CANCEL, this);
 
-	lv_group_add_obj(inputGroup, HWTest);
+		lv_group_add_obj(inputGroup, HWTest);
+	}
 }
 
 SettingsScreen::~SettingsScreen(){
