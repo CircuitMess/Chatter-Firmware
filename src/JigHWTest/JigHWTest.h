@@ -34,7 +34,6 @@ private:
 	void log(const char *property, uint32_t value);
 	void log(const char *property, int32_t value);
 	void log(const char *property, const String& value);
-	void prompt();
 
 	static bool LoRaTest();
 	static bool BatteryCheck();

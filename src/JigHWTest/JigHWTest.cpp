@@ -148,10 +148,6 @@ void JigHWTest::log(const char* property, const String& value){
 	Serial.printf("%s:%s:%s\n", currentTest, property, value.c_str());
 }
 
-void JigHWTest::prompt(){
-	Serial.printf("TEST:prompt:1\n");
-}
-
 bool JigHWTest::LoRaTest(){
 	LLCC68 radio(new Module(RADIO_CS, RADIO_DIO1, RADIO_RST, RADIO_BUSY, Chatter.getSPILoRa()));
 	int state = radio.begin(868, 500, 9, 5, RADIOLIB_SX126X_SYNC_WORD_PRIVATE, 22, 8, 0, false);
@@ -217,7 +213,6 @@ uint32_t JigHWTest::calcChecksum(File& file){
 }
 
 bool JigHWTest::buttons(){
-	test->prompt();
 	auto input = Chatter.getInput();
 
 	const auto cX = test->canvas->getCursorX();
