@@ -343,7 +343,7 @@ void SpaceInvaders::SpaceInvaders::handledeath() {
 //----------------------------------------------------------------------------
 void SpaceInvaders::SpaceInvaders::clearButtonCallbacks()
 {
-	for(auto i : { BTN_A, BTN_B, BTN_LEFT, BTN_RIGHT })
+	for(auto i : { BTN_A, BTN_B, BTN_LEFT, BTN_RIGHT, BTN_4, BTN_5, BTN_6 })
 	{
 		buttons->setBtnReleaseCallback(i, nullptr);
 		buttons->setBtnPressCallback(i, nullptr);
@@ -353,23 +353,34 @@ void SpaceInvaders::SpaceInvaders::clearButtonCallbacks()
 }
 void SpaceInvaders::SpaceInvaders::setButtonsCallbacks() {
 	clearButtonCallbacks();
-	buttons->setButtonHeldRepeatCallback(BTN_LEFT, 10, [](uint){
+
+	const auto goLeft = [](uint){
 		if (instance->shipx > 0 && instance->deadcounter == -1) {
 			instance->shipx-=1.5f;
 		}
-	});
-	buttons->setButtonHeldRepeatCallback(BTN_RIGHT, 10, [](uint){
+	};
+
+	const auto goRight = [](uint){
 		if (instance->shipx < 143 && instance->deadcounter == -1) {
 			instance->shipx+=1.5f;
 		}
-	});
-	buttons->setBtnPressCallback(BTN_A, [](){
+	};
+
+	const auto shoot = [](){
 		if(instance->shotx == -1 && instance->deadcounter == -1){
 			instance->Audio.play({{450, 300, 100}});
 			instance->shotx = instance->shipx + 6;
 			instance->shoty = instance->shipy - 2;
 		}
-	});
+	};
+
+	buttons->setButtonHeldRepeatCallback(BTN_LEFT, 10, goLeft);
+	buttons->setButtonHeldRepeatCallback(BTN_4, 10, goLeft);
+	buttons->setButtonHeldRepeatCallback(BTN_RIGHT, 10, goRight);
+	buttons->setButtonHeldRepeatCallback(BTN_6, 10, goRight);
+	buttons->setBtnPressCallback(BTN_A, shoot);
+	buttons->setBtnPressCallback(BTN_5, shoot);
+
 	buttons->setBtnPressCallback(BTN_B, [](){
 		instance->gamestatus = "paused";
 	});

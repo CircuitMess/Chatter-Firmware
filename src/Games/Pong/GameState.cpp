@@ -44,21 +44,19 @@ void Bonk::GameState::start(Bonk& _game)
 {
 	game = &_game;
 
-	Input::getInstance()->setBtnPressCallback(BTN_UP, [](){
-		instance->playerUp = true;
-	});
+	const auto pressUp = [](){ instance->playerUp = true; };
+	const auto releaseUp = [](){ instance->playerUp = false; };
+	const auto pressDown = [](){ instance->playerDown = true; };
+	const auto releaseDown = [](){ instance->playerDown = false; };
 
-	Input::getInstance()->setBtnReleaseCallback(BTN_UP, [](){
-		instance->playerUp = false;
-	});
-
-	Input::getInstance()->setBtnPressCallback(BTN_DOWN, [](){
-		instance->playerDown = true;
-	});
-
-	Input::getInstance()->setBtnReleaseCallback(BTN_DOWN, [](){
-		instance->playerDown = false;
-	});
+	Input::getInstance()->setBtnPressCallback(BTN_UP, pressUp);
+	Input::getInstance()->setBtnPressCallback(BTN_2, pressUp);
+	Input::getInstance()->setBtnReleaseCallback(BTN_UP, releaseUp);
+	Input::getInstance()->setBtnReleaseCallback(BTN_2, releaseUp);
+	Input::getInstance()->setBtnPressCallback(BTN_DOWN, pressDown);
+	Input::getInstance()->setBtnPressCallback(BTN_8, pressDown);
+	Input::getInstance()->setBtnReleaseCallback(BTN_DOWN, releaseDown);
+	Input::getInstance()->setBtnReleaseCallback(BTN_8, releaseDown);
 
 	Input::getInstance()->setBtnPressCallback(BTN_B, [](){
 		instance->game->pauseGame();
@@ -70,8 +68,12 @@ void Bonk::GameState::stop()
 {
 	Input::getInstance()->removeBtnPressCallback(BTN_UP);
 	Input::getInstance()->removeBtnReleaseCallback(BTN_UP);
+	Input::getInstance()->removeBtnPressCallback(BTN_2);
+	Input::getInstance()->removeBtnReleaseCallback(BTN_2);
 	Input::getInstance()->removeBtnPressCallback(BTN_DOWN);
 	Input::getInstance()->removeBtnReleaseCallback(BTN_DOWN);
+	Input::getInstance()->removeBtnPressCallback(BTN_8);
+	Input::getInstance()->removeBtnReleaseCallback(BTN_8);
 	Input::getInstance()->removeBtnPressCallback(BTN_B);
 }
 void Bonk::GameState::draw()

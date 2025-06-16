@@ -161,14 +161,17 @@ void SpaceRocks::buttonPressed(uint i){
 			break;
 
 		case BTN_LEFT:
+		case BTN_4:
 			leftHold = true;
 			break;
 
 		case BTN_RIGHT:
+		case BTN_6:
 			rightHold = true;
 			break;
 
 		case BTN_ENTER:
+		case BTN_5:
 			if(state != Running) return;
 			shootBullet();
 			break;
@@ -178,10 +181,12 @@ void SpaceRocks::buttonPressed(uint i){
 void SpaceRocks::buttonReleased(uint i){
 	switch(i){
 		case BTN_LEFT:
+		case BTN_4:
 			leftHold = false;
 			break;
 
 		case BTN_RIGHT:
+		case BTN_6:
 			rightHold = false;
 			break;
 	}
