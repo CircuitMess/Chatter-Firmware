@@ -9,11 +9,18 @@
 #include <Chatter.h>
 #include <Notes.h>
 #include <Util/HWRevision.h>
+#include <ChatterDisplay.h>
 
 JigHWTest *JigHWTest::test = nullptr;
 
 JigHWTest::JigHWTest(Display* display) : display(display), canvas(display->getBaseSprite()){
 	test = this;
+
+	display->getTft()->setPanel(ChatterDisplay::panel2());
+	display->begin();
+	display->swapBytes(false);
+	display->getBaseSprite()->clear(TFT_BLACK);
+	display->commit();
 
 	tests.push_back({JigHWTest::LoRaTest, "LoRa", [](){ }});
 	tests.push_back({JigHWTest::BatteryCheck, "Bat check", [](){}});
