@@ -168,10 +168,17 @@ bool JigHWTest::LoRaTest(){
 
 bool JigHWTest::BatteryCheck(){
 	Battery.begin();
-	uint16_t voltage = Battery.getVoltage();
 
-	if(voltage < referenceVoltage - 100 || voltage > referenceVoltage + 100){
-		test->log("voltage", (uint32_t) voltage);
+	test->log("voltage", (uint32_t) Battery.getVoltage());
+	test->log("offset", Battery.getVoltOffset());
+
+	if(abs(Battery.getVoltOffset()) > 100){
+		test->log("offset", Battery.getVoltOffset());
+		return false;
+	}
+
+	if(Battery.getVoltage() < 4600){
+		test->log("voltage", (uint32_t) Battery.getVoltage());
 		test->log("offset", Battery.getVoltOffset());
 		return false;
 	}
