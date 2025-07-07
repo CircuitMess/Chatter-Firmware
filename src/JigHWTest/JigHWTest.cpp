@@ -25,7 +25,7 @@ JigHWTest::JigHWTest(Display* display) : display(display), canvas(display->getBa
 	tests.push_back({JigHWTest::LoRaTest, "LoRa", [](){ }});
 	tests.push_back({JigHWTest::BatteryCheck, "Bat check", [](){}});
 	tests.push_back({JigHWTest::SPIFFSTest, "SPIFFS", [](){ }});
-	tests.push_back({JigHWTest::buttons, "Buttons", [](){ }});
+//	tests.push_back({JigHWTest::buttons, "Buttons", [](){ }});
 	tests.push_back({JigHWTest::hwRevision, "HW rev"});
 }
 
@@ -93,6 +93,11 @@ void JigHWTest::start(){
 	const auto note = NOTE_C6 + ((rand() * 20) % 400) - 200;
 	for(;;){
 		if(millis() - flashTime >= 500){
+			if(!painted){
+				Piezo.tone(note);
+			}else{
+				Piezo.noTone();
+			}
 			for(int x = 0; x < canvas->width(); x++){
 				for(int y = 0; y <  canvas->height(); y++){
 					if(!painted && canvas->readPixel(x, y) == TFT_BLACK){
@@ -118,7 +123,6 @@ void JigHWTest::start(){
 		}
 
 		if(press && !tone){
-			Piezo.tone(note);
 			tone = true;
 		}else if(!press && tone){
 			Piezo.noTone();
@@ -167,19 +171,49 @@ bool JigHWTest::LoRaTest(){
 }
 
 bool JigHWTest::BatteryCheck(){
-	Battery.begin();
+	pinMode(BATTERY_PIN, INPUT);
+	pinMode(CALIB_READ, INPUT);
+	pinMode(CALIB_EN, OUTPUT);
 
-	test->log("voltage", (uint32_t) Battery.getVoltage());
-	test->log("offset", Battery.getVoltOffset());
+	esp_adc_cal_characteristics_t calChars;
 
-	if(abs(Battery.getVoltOffset()) > 100){
-		test->log("offset", Battery.getVoltOffset());
+	analogSetAttenuation(ADC_2_5db);
+
+	//Newer ESP32's used in HWRevision 1 (Wireless-tag WT32-S1) have calibration in efuse
+	esp_adc_cal_characterize(ADC_UNIT_1, ADC_ATTEN_DB_2_5, ADC_WIDTH_BIT_12, 0, &calChars);
+
+	digitalWrite(CALIB_EN, 1);
+	delay(100);
+
+	float sum = 0;
+	for(int i = 0; i < MeasureCount; i++){
+		sum += esp_adc_cal_raw_to_voltage(analogRead(CALIB_READ), &calChars) * Factor;
+	}
+	const uint16_t volt = std::round(sum / (float) MeasureCount);
+
+	int16_t calibOffset = VoltReference - volt;
+
+	test->log("calib offset", calibOffset);
+
+	digitalWrite(CALIB_EN, 0);
+	delay(100);
+
+	if(abs(calibOffset) > VoltReferenceTolerance){
 		return false;
 	}
 
-	if(Battery.getVoltage() < 4600){
-		test->log("voltage", (uint32_t) Battery.getVoltage());
-		test->log("offset", Battery.getVoltOffset());
+
+
+
+	sum = 0;
+	for(int i = 0; i < MeasureCount; i++){
+		sum += esp_adc_cal_raw_to_voltage(analogRead(BATTERY_PIN), &calChars) * Factor;
+	}
+	const uint16_t measured = std::round(sum / (float) MeasureCount);
+
+	test->log("voltage", measured);
+
+	if(measured < USBVoltageMinimum){
 		return false;
 	}
 

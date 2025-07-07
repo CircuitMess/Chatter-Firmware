@@ -38,12 +38,18 @@ private:
 	static bool LoRaTest();
 	static bool BatteryCheck();
 	static bool SPIFFSTest();
-	static bool buttons();
 	static bool hwRevision();
+	/** UNUSED */
+	static bool buttons();
 
 	static uint32_t calcChecksum(fs::File& file);
 
-	static const int16_t referenceVoltage = 4800;
+	static constexpr int16_t USBVoltageMinimum = 3300;
+
+	static constexpr float VoltReference = 2500;
+	static constexpr float VoltReferenceTolerance = 100;
+	static constexpr uint16_t MeasureCount = 10;
+	static constexpr uint8_t Factor = 4;
 
 	static constexpr uint8_t ButtonCount = 16;
 
