@@ -114,20 +114,6 @@ void JigHWTest::start(){
 		}
 
 		LoopManager::loop();
-		auto press = false;
-		for(int i = 0; i < ButtonCount; i++){
-			if(Chatter.getInput()->getButtonState(i)){
-				press = true;
-				break;
-			}
-		}
-
-		if(press && !tone){
-			tone = true;
-		}else if(!press && tone){
-			Piezo.noTone();
-			tone = false;
-		}
 	}
 }
 
