@@ -28,7 +28,7 @@ void RenderSystem::update(uint32_t deltaMicros){
 	for(auto layer : layersVec){
 		for(const auto& object : layerMap[layer]){
 			auto pos = object->getPos();
-			object->getRenderComponent()->push(canvas, { (int16_t)std::round(pos.x), (int16_t)std::round(pos.y) }, object->getRot());
+			object->getRenderComponent()->push(canvas, { (int16_t)round(pos.x), (int16_t)round(pos.y) }, object->getRot());
 		}
 	}
 }

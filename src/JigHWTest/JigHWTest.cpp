@@ -175,7 +175,7 @@ bool JigHWTest::BatteryCheck(){
 	for(int i = 0; i < MeasureCount; i++){
 		sum += esp_adc_cal_raw_to_voltage(analogRead(CALIB_READ), &calChars) * Factor;
 	}
-	const uint16_t volt = std::round(sum / (float) MeasureCount);
+	const uint16_t volt = round(sum / (float) MeasureCount);
 
 	int16_t calibOffset = VoltReference - volt;
 
@@ -195,7 +195,7 @@ bool JigHWTest::BatteryCheck(){
 	for(int i = 0; i < MeasureCount; i++){
 		sum += esp_adc_cal_raw_to_voltage(analogRead(BATTERY_PIN), &calChars) * Factor;
 	}
-	const uint16_t measured = std::round(sum / (float) MeasureCount);
+	const uint16_t measured = round(sum / (float) MeasureCount);
 
 	test->log("voltage", measured);
 

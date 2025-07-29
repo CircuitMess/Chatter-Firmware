@@ -107,8 +107,8 @@ void UnlockSlide::repos(){
 			x = 0;
 		}
 
-		lv_obj_set_x(lock, std::round(x));
+		lv_obj_set_x(lock, round(x));
 	}else{
-		lv_obj_set_x(lock, std::round(t * (float) (lv_obj_get_width(obj) - 4)));
+		lv_obj_set_x(lock, round(t * (float) (lv_obj_get_width(obj) - 4)));
 	}
 }
