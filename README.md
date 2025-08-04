@@ -109,6 +109,41 @@ following esptool command call (before referencing the built image):
 esptool --chip esp32 --baud 921600  --before default_reset --after hard_reset write_flash -z --flash_mode dio --flash_freq 80m --flash_size detect 0x211000 spiffs.bin
 ```
 
+# Restoring the stock firmware
+
+There are three main ways to restore the stock firmware:
+
+### 1) Restoring using esptool
+
+For uploading the firmware this way, you will need to
+download [esptool](https://github.com/espressif/esptool).
+
+Then download the prebuilt binary on
+the [releases page](https://github.com/CircuitMess/Chatter-Firmware/releases) of this repository
+and flash it manually using esptool:
+
+```shell
+esptool write_flash 0x0 Codee-Firmware.bin
+```
+
+### 2) Restoring using Arduino's burn bootloader option
+
+This Arduino option is usually reserved for bootloader flashing.
+
+For devices included in the CircuitMess ESP32 Arduino platform this will actually restore the
+firmware.
+
+Open this project in Arduino and select your board in the `Tools > Board` dropdown menu.
+
+Then select the appropriate firmware under `Tools > Programmer` and click the `Tools > Burn 
+bootloader` option.
+
+### 3) Restoring using CircuitBlocks
+
+[CircuitBlocks](https://code.circuitmess.com/) is our educational block-based coding platform.
+
+You can also restore your firmware here by logging in, clicking the "Restore Firmware" button in
+the top-right corner, and following the on-screen instructions.
 ---
 Copyright © 2025 CircuitMess
 
