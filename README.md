@@ -142,8 +142,9 @@ bootloader` option.
 
 [CircuitBlocks](https://code.circuitmess.com/) is our educational block-based coding platform.
 
-You can also restore your firmware here by logging in, clicking the "Restore Firmware" button in
-the top-right corner, and following the on-screen instructions.
+You can also restore your firmware here by logging in, clicking the "Restore Firmware" button in the toip-right corner,
+and following the on-screen instructions.
+
 ---
 Copyright © 2025 CircuitMess
 
